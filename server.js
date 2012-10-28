@@ -63,10 +63,17 @@ if (cluster.isMaster) {
         });
         app.use(app.router);
         app.use(require('less-middleware')({ src: __dirname + '/public' }));
+    });
+
+    app.configure('development', function(){
         app.use(express.static(path.join(__dirname, 'public')));
     });
 
-    // todo: add Cache-Control: max-age=(seconds) headers
+    var oneDay = 86400000;
+    app.configure('production', function(){
+        app.use(express.static(path.join(__dirname, 'public'), { maxAge: oneDay }));
+    });
+
     // todo: add authentication
     // todo: add billing
     // todo: add like and comments
