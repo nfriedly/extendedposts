@@ -73,11 +73,11 @@ app.get('/post/:id', function(req, res) {
 // fb likes to POST to the redirect url
 // /post/28?post_id=100001635164962_548726125142879
 app.post('/post/:id', function(req, res) {
-    if (req.querystring.post_id) {
+    if (req.query.post_id) {
         // the user posted this story to his or her wall
-        Posts.addFbPostId(req.params.id, req.querystring.post_id);
+        Posts.addFbPostId(req.params.id, req.query.post_id);
     }
-    res.redirect(req.querystring.redirect_ur || '/post/' + req.params.id);
+    res.redirect(req.query.redirect_ur || '/post/' + req.params.id);
 });
 
 app.post('/post/new', function(req, res) {
