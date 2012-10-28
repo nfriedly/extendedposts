@@ -33,6 +33,11 @@ app.get('/', function(req, res) {
     res.render('index', addTemplateGlobals({}));
 });
 
+// fb likes to issue POST requests to the home page
+app.post('/', function(req, res) {
+    res.render('index', addTemplateGlobals({}));
+});
+
 app.get('/post/new', function(req, res) {
     res.render('new_post', addTemplateGlobals({}));
 });
