@@ -253,7 +253,7 @@ if (cluster.isMaster) {
         data.title = data.title || "ExtendedPosts";
         data.gaId = process.env.GA_ID || false;
         data.environment = process.env.NODE_ENV || 'development';
-        data.fb_app_id = process.env.FB_APP_ID || "458521630865987"
+        data.fb_app_id = process.env.FB_APP_ID || "458521630865987";
         return data;
     }
 
