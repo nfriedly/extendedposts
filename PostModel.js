@@ -7,10 +7,18 @@ function NoRowsError(){
 NoRowsError.prototype = new Error();
 module.exports.NoRowsError = NoRowsError;
 
-var client = new pg.Client(process.env.DATABASE_URL || "tcp://postgres:1234@localhost/postgres");
-client.connect();
+var DB_URL = process.env.DATABASE_URL || "tcp://postgres:1234@localhost/postgres";
+console.log('about to connect to db:', DB_URL);
+var client = new pg.Client(DB_URL);
+client.connect(function(err, client) {
+    if (err) {
+        console.error('error connecting to database:', err);
+    } else {
+        console.log('database connection successful!');
+    }
+});
 
-client.query('CREATE TABLE IF NOT EXISTS posts (id SERIAL PRIMARY KEY, name varchar(100) NOT NULL, body text NOT NULL)');
+client.query('CREATE TABLE IF NOT EXISTS posts (id SERIAL PRIMARY KEY, name varchar(100) NOT NULL, body text NOT NULL)').on('error', console.error);
 
 function queryToStream(query) {
     var res = new Stream();
