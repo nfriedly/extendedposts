@@ -47,6 +47,32 @@ html(class='no-js', lang='en')
                 block content
             footer
 
+        #fb-root
+        script
+            window.fbAsyncInit = function() {
+            // init the FB JS SDK
+            FB.init({
+            appId      : '#{fb_app_id}', // App ID from the App Dashboard
+            //- channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File for x-domain communication
+            status     : false, // check the login status upon init?
+            cookie     : false, // set sessions cookies to allow your server to access the session?
+            xfbml      : false  // parse XFBML tags on this page?
+            });
+
+            FB.Canvas.setSize();
+            FB.Canvas.setDoneLoading();
+
+            };
+
+            // Load the SDK's source Asynchronously
+            (function(d){
+            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement('script'); js.id = id; js.async = true;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            ref.parentNode.insertBefore(js, ref);
+            }(document));
+
         //- script(src='//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js')
         //- script window.jQuery || document.write('<script src="javascripts/libs/jquery-1.6.3.min.js"><\\/script>')
 
@@ -64,6 +90,7 @@ html(class='no-js', lang='en')
                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                 })();
+
 
 
         //- if lt IE 7

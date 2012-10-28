@@ -4,7 +4,7 @@ block set_options
     - var title = "Create a new story to to post to Facebook"
 
 block content
-    form.form-horizontal(action="/post/new", method="POST")
+    form.form-horizontal(action="/post/new", method="POST", target="_top")
         legend
             | New Story&nbsp;
             i.icon-align-left

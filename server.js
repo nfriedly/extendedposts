@@ -113,6 +113,10 @@ app.post('/post/new', function(req, res) {
     Posts.new(req.body).on('data', function(result) {
         console.log('post saved and database row found: ', result);
         var read_post_url = (process.env.FB_APP_URL || "https://apps.facebook.com/extendedposts/") + "post/" +  result.id;
+        var redirect_url = read_post_url;
+        if (req.body.redirect_url) {
+           redirect_url +='?redirect_url=' + req.body.redirect_url;
+        }
         var post_to_fb_url = util.format('https://www.facebook.com/dialog/feed?app_id=%s&link=%s&picture=%s&name=%s&caption=%s&description=%s&redirect_uri=%s&properties=%s%s',
             process.env.FB_APP_ID || '458521630865987',
             encodeURIComponent(read_post_url),
@@ -120,7 +124,7 @@ app.post('/post/new', function(req, res) {
             encodeURIComponent(req.body.name),
             encodeURIComponent(caption),
             encodeURIComponent(description),
-            encodeURIComponent(read_post_url + req.body.redirect_url ?  '?redirect_url=' + req.body.redirect_url : ''),
+            encodeURIComponent(redirect_url),
             encodeURIComponent(JSON.stringify({' ':{text: 'Continue reading...', href:read_post_url}})),
             encodeURIComponent((req.body.actions) ? '&actions=' + req.body.actions : '')
         );
@@ -158,6 +162,7 @@ function addTemplateGlobals(data) {
     data.title = data.title || "ExtendedPosts";
     data.gaId = process.env.GA_ID || false;
     data.environment = process.env.NODE_ENV || 'development';
+    data.fb_app_id = process.env.FB_APP_ID || "458521630865987"
     return data;
 }
 
