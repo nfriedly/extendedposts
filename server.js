@@ -35,7 +35,7 @@ app.get('/', function(req, res) {
 
 // fb likes to issue POST requests to the home page
 app.post('/', function(req, res) {
-    res.render('index', addTemplateGlobals({}));
+    res.redirect('/');
 });
 
 app.get('/post/new', function(req, res) {
