@@ -5,8 +5,13 @@
 	"author": "Nathan Friedly - http://nfriedly.com/",
 	"main": "server.js",
 	"dependencies": {
-		"express": "3.x"
-	},
+		"express": "3.0.x",
+        "pg": "0.8.x",
+        "jade": "0.27.x",
+        "less-middleware": "0.1.x",
+        "underscore": "1.4.x",
+        "jsdom": "0.2.x"
+    },
 	"engines": {
 		"node": "0.8.x",
 		"npm": "1.1.x"

@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    h2 New Post
+    form(action="/post/new", method="POST")
+        p Name:
+            input(name="name")
+        p Picture url:
+            input(name="picture")
+        p Body:
+            textarea(name="body")
+        p
+            input(type="submit", value="Post to Facebook")
