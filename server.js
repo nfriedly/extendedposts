@@ -27,15 +27,22 @@ app.configure(function(){
     app.use(express.static(path.join(__dirname, 'public')));
 });
 
-// todo: add www-redirection and Cache-Control: max-age=(seconds) headers
+// todo: add Cache-Control: max-age=(seconds) headers
+// todo: add authentication
+// todo: add billing
 
 app.get('/', function(req, res) {
-    res.render('index', addTemplateGlobals({}));
+    res.render('index', addTemplateGlobals({title: "Post beautiful stories to Facebook's Timeline"}));
 });
 
 // fb likes to issue POST requests to the home page
 app.post('/', function(req, res) {
     res.redirect('/');
+});
+
+app.get(/(about|pricing|docs)/, function(req, res) {
+    var page = req.params[0];
+    res.render(page, addTemplateGlobals());
 });
 
 app.get('/post/new', function(req, res) {
@@ -61,6 +68,16 @@ app.get('/post/:id', function(req, res) {
             res.send(500, err);
         }
     });
+});
+
+// fb likes to POST to the redirect url
+// /post/28?post_id=100001635164962_548726125142879
+app.post('/post/:id', function(req, res) {
+    if (req.querystring.post_id) {
+        // the user posted this story to his or her wall
+        Posts.addFbPostId(req.params.id, req.querystring.post_id);
+    }
+    res.redirect(req.querystring.redirect_ur || '/post/' + req.params.id);
 });
 
 app.post('/post/new', function(req, res) {
@@ -103,11 +120,30 @@ app.post('/post/new', function(req, res) {
             encodeURIComponent(req.body.name),
             encodeURIComponent(caption),
             encodeURIComponent(description),
-            encodeURIComponent(req.body.redirect_url || read_post_url),
+            encodeURIComponent(read_post_url + req.body.redirect_url ?  '?redirect_url=' + req.body.redirect_url : ''),
             encodeURIComponent(JSON.stringify({' ':{text: 'Continue reading...', href:read_post_url}})),
             encodeURIComponent((req.body.actions) ? '&actions=' + req.body.actions : '')
         );
-        res.redirect(post_to_fb_url);
+
+
+        var formats = {
+            text: function(){
+                res.type('.txt').send(post_to_fb_url);
+            },
+            html: function(){
+                res.redirect(post_to_fb_url);
+            },
+            json: function(){
+                res.jsonp({post_to_fb_url: post_to_fb_url});
+            }
+        };
+
+        if (formats[req.query.format]) {
+            formats[req.query.format]();
+        } else {
+            res.format(formats);
+        }
+
     }).on('error', function(err){
         res.send(500, err)
     });
@@ -119,6 +155,7 @@ app.listen(app.get('port'), function(){
 
 function addTemplateGlobals(data) {
     data = data || {};
+    data.title = data.title || "ExtendedPosts";
     data.gaId = process.env.GA_ID || false;
     data.environment = process.env.NODE_ENV || 'development';
     return data;

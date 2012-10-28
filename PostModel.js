@@ -19,6 +19,7 @@ client.connect(function(err, client) {
 });
 
 client.query('CREATE TABLE IF NOT EXISTS posts (id SERIAL PRIMARY KEY, name varchar(100) NOT NULL, body text NOT NULL)').on('error', console.error);
+client.query('CREATE TABLE IF NOT EXISTS fb_posts (post_id integer NOT NULL REFERENCES posts (id), fb_post_id varchar(60) UNIQUE NOT NULL)').on('error', console.error);
 
 function queryToStream(query) {
     var res = new Stream();
@@ -74,4 +75,26 @@ module.exports.new = function(data) {
 
 module.exports.update = function(id, data) {
 
+};
+
+
+module.exports.addbPostId = function(id, fb_post_id) {
+    var res = new Stream();
+    res.readable = true;
+    res.writeable = true;
+
+    var query = client.query("INSERT INTO fb_posts (post_id, fb_post_id) VALUES ($1, $2)", [id, fb_post_id]);
+
+    query.on('error', function(err) {
+        res.emit('error', err);
+    });
+
+    query.on('end', function(result) {
+        if (!result.rowCount) {
+            res.emit('error', 'Post was not saved');
+        }
+        res.emit('end');
+    });
+
+    return res;
 };

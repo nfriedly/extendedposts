@@ -1,13 +1,25 @@
 extends layout
 
+block set_options
+    - var title = "Create a new story to to post to Facebook"
+
 block content
-    h2 New Post
-    form(action="/post/new", method="POST")
-        p Name:
-            input(name="name")
-        p Picture url:
-            input(name="picture")
-        p Body:
-            textarea(name="body")
-        p
-            input(type="submit", value="Post to Facebook")
+    form.form-horizontal(action="/post/new", method="POST")
+        legend
+            | New Story&nbsp;
+            i.icon-align-left
+        .control-group
+            label.control-label(for="name") Name:
+            .controls
+                input.span5(name="name", maxlength="80")
+        .control-group
+            label.control-label(for="picture") Picture URL:
+            .controls
+                input.span5(name="picture")
+        .control-group
+            label.control-label(for="body") Body:
+            .controls
+                textarea.span5(name="body", rows="5")
+        .control-group
+            .controls
+                button.btn.btn-primary.icon-facebook(type="submit")  Post to Facebook

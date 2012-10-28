@@ -1,0 +1,55 @@
+extends layout
+
+block set_title
+    - var title = "API Documentation"
+
+block content
+    h1 <b>Extended</b>Posts REST API
+
+    p The API is closely modeled after <a href="https://developers.facebook.com/docs/reference/dialogs/feed/">Facebook's Feed Dialog API</a>
+
+    h2 Creating a new story
+
+    p Send a HTTP POST to <code>http://api.extendedposts.com/post/new</code> with the following fields:
+
+    table.table.table-bordered.table-striped
+        caption /post/new API fields
+        thead
+            tr
+                th Field
+                th Type
+                th Description
+                th Required?
+        tbody
+            tr
+                td: code name
+                td Text
+                td The title of the story you're creating
+                td Required
+            tr
+                td: code picture
+                td URL
+                td A full url to the most relevant picture that goes with this story
+                td Required
+            tr
+                td: code body
+                td HTML
+                td The full story you're posting. All images / embeds must have absolute, secure (https:// or //) links.
+                td Required
+            tr
+                td: code caption
+                td Text
+                td The first paragraph of your story - 80 characters max. Automatically generated from the Body if omitted.
+                    br
+                    small (If the first paragraph is over 80 characters, only one paragraph will be displayed.)
+                td
+            tr
+                td: code description
+                td Text
+                td The first paragraph of your story - 320 characters max. Automatically generated from the Body if omitted.
+                td
+            tr
+                td: code return_url
+                td URL
+                td A full url to send users to after they've posted. If omitted, the user will be directed to the post.
+                td

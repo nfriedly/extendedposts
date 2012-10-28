@@ -12,22 +12,38 @@ html(class='no-js', lang='en')
         meta(charset='utf-8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
 
-        title
+        block set_options
+            - var title;
+            - var link;
+
+        - if (typeof title == "undefined") { var title; }
+        - if (typeof link == "undefined") { var link; }
+
+        - if (!title) { title = "ExtendedPosts" } else { title = title + " | ExtendedPosts" }
+
+        title #{title}
         //- meta(name='description', content='')
         //- meta(name='author', content='')
 
-        //- meta(name='viewport', content='width=device-width,initial-scale=1')
+        meta(name='viewport', content='width=device-width,initial-scale=1')
 
-        link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/style.css')
 
     body
-        #container
-            block header
-                header
-                    h1
-                        a(href="/") <b>Extended</b>Posts
+        header.navbar.navbar-fixed-top.navbar-inverse
+            .navbar-inner
+                .container
+                    a(href="/").brand <b>Extended</b>Posts
+                    ul.nav
+                        - console.log('link', link);
+                        - var links = {"Home":"/", "About":"/about", "Pricing":"/pricing", "API Documentation": "/docs"}
+                        each thisLink, name in links
+                            if link == thisLink
+                                li.active: a(href="#{thisLink}") #{name}
+                            else
+                                li: a(href="#{thisLink}") #{name}
+        .container
             #main
-                //- (role='main')
                 block content
             footer
 

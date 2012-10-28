@@ -1,7 +1,34 @@
 extends layout
 
-block content
-    p A companion API to FaceBook's Open Graph API that allows you to post longer, fully formatted stories to users timelines.
-    p <a href="/post/new">Create a post</a> - free while in alpha! *
-    small * Note: we will probably loose / delete / mangle your post at some point before reaching the beta stage.
+block set_options
+    - var title = "Let your users post beautiful stories to Facebook"
 
+block content
+    .hero-unit
+        .span4.pull-right
+            h1.graphics
+                i.icon-facebook.blue
+                | &nbsp;+&nbsp;
+                i.icon-align-left
+                | &nbsp;=&nbsp;
+                i.icon-heart.red
+        h1 Put the full story on Facebook
+        h2 <b>Extended</b>Posts allows you to post beautiful, full HTML stories to users timelines.
+        p
+            a.btn.btn-primary.btn-large(href="/post/new") Try it for free right now
+                | &nbsp;
+                i.icon-circle-arrow-right
+
+    .row
+        .span4
+            h2.icon-bar-chart  Easy A/B testing
+            p Test different variations on your post to see which one gets the best result
+        .span4
+            h2  Simple and Reliable
+            p Quick integration and you never have to worry about Facebook changes breaking your site
+        .span4
+            h2.icon-bolt  Developer API
+            p Integrates with your website in no-time-flat!
+    .row
+        .span12
+            p: small    * Note: We're still in the Alpha stage. Everything's free and we will probably loose / delete / mangle your post at some point before reaching Beta.

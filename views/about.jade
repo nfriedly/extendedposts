@@ -1,0 +1,20 @@
+extends layout
+
+block set_options
+    - var title = "About"
+    - var link = "/about"
+
+block content
+    h1 About <b>Extended</b>Posts
+
+    h2.icon-flag  The story
+    p <b>Extended</b>Posts was built by <a href="http://nfriedly.com/">Nathan Friedly</a> to solve a need that he had run into and had seen countless other developers hit.
+    p The basic premise is simple: Post beautiful, fully-formatted stories to Facebook, don't make user's leave Facebook to read them.
+
+    h2.icon-magic  How it works
+    p How it works is simple: you send the story to <b>Extended</b>Posts, we send you back a link that will let your users post the full story to Facebook.
+    p
+        | The <b>Extended</b>Posts API is extremely close to Facebook's own <a href="https://developers.facebook.com/docs/reference/dialogs/feed/">Feed Dialog</a> API.
+        | We work any way you do: our API can be used with and without JavaScript, the links can be put on your website, into emails, etc, and we even offer a page on our site that lets you quickly build a one-off link.
+
+
