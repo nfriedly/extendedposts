@@ -78,7 +78,7 @@ module.exports.update = function(id, data) {
 };
 
 
-module.exports.addbPostId = function(id, fb_post_id) {
+module.exports.addFbPostId = function(id, fb_post_id) {
     var res = new Stream();
     res.readable = true;
     res.writeable = true;
