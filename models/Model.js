@@ -10,18 +10,18 @@ var Model = function(table, fields) {
     var self = this;
 
     // set up the stored procedure for getById
-    client.query({
-        name: this.table + 'getById',
-        text: util.format('SELECT * FROM %s WHERE id=$1', this.table),
-        values: [0]
-    });
-
-    self.get = function(id) {
-        return self.queryToStream(client.query({
-            name: self.table + 'getById',
-            values: [id]
-        }));
-    };
+//    client.query({
+//        name: this.table + 'getById',
+//        text: util.format('SELECT * FROM %s WHERE id=$1', this.table),
+//        values: [0]
+//    });
+//
+//    self.get = function(id) {
+//        return self.queryToStream(client.query({
+//            name: self.table + 'getById',
+//            values: [id]
+//        }));
+//    };
 
     var INSERT_QUERY = util.format(
         'INSERT INTO %s (%s) VALUES (%s)',
