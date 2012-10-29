@@ -10,7 +10,9 @@
         "jade": "0.27.x",
         "less-middleware": "0.1.x",
         "underscore": "1.4.x",
-        "jsdom": "0.2.x"
+        "jsdom": "0.2.x",
+        "stripe": "1.2.x",
+        "async": "0.1.x"
     },
 	"engines": {
 		"node": "0.8.x",

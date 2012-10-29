@@ -1,0 +1,67 @@
+extends layout
+
+block set_options
+    - var title = "Signup"
+    - var link = "/signup"
+
+block content
+    h1 Pick your plan
+
+    .row
+        .span4.offset1.plan.pro
+            h2 Pro
+            Perfect for small-medium businesses
+            ul
+                li Up to 1000 posts / shares per month
+                li Full API access
+                li Human, top-level email support
+                li A/B testing
+                    em - comming soon
+
+            a.btn.btn-primary(href="/account/new?plan=pro")
+                | Sign Up now, $50/month
+                | &nbsp;
+                i.icon-circle-arrow-right
+        .span4.offset1.plan.enterprise
+            h2 Enterprise
+            Perfect for small-medium businesses
+            ul
+                li Up to 10k posts / shares per month
+                li Telephone & email support
+                li <abbr title="Service Level Agreement">SLA</abbr> with up time gaurentee
+                li All Pro-level features
+
+            a.btn.disabled(href="#")
+                | Coming soon, $250/month
+                | &nbsp;
+                i.icon-circle-arrow-right
+
+    .row
+        .span10.offset1
+            p Need something different? <a href="/contact">Contact us</a> and we'll see if we can work out a deal that fits your situation.
+
+    .row
+        .span11
+            h2.faq Frequently Asked Questions
+
+            h3 What happens when I exceed my posts / shares limits?
+            p We send you a polite email congratulating you on your growing fame and suggesting that you might be interested in an alternate service level.
+                | That's it, everything else continues to work as normal.
+
+            h3 What Facebook permissions does <b>Extended</b>Posts require from users?
+            p None! We can work with completely anonymous users and do not require even basic permissions.
+
+            //- h3 Can I use my existing Facebook APP ID?
+            //- p In most cases, yes. If you don't already have a canvas app, then you can defenately use your APP ID.
+            //- If you do, then it gets tricky, but we can most likely make it work.
+
+            //- h3 What are the benefits to using my existing Facebook App ID?
+            //- p If your users have already granted you <code>read_stream</code> permission, you can see what comments they added to their posts.
+            //- | Otherwise there's no difference.
+
+            //- h3 Can I get my data back?
+            //- p Yep! You have full API access which includes the ability to read back all of your data.
+
+            h3 What's your <span title="AUP">Acceptable Use Policy</span>?
+            p Don't abuse things. In general, if it falls within Facebook's policies, we'll be fine with it too.
+

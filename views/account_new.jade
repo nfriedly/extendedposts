@@ -1,0 +1,163 @@
+extends layout
+
+block set_options
+    - var title = "Sign up"
+
+block content
+    h1 Sign up for <b>Extended</b>Posts
+    form#signup-form.form-horizontal(action="/account/new", method="POST", target="_top")
+        legend Account Info
+        .control-group
+            label.control-label(for="name") Name:
+            .controls
+                input.span5(name="name", id="name", maxlength="255", type="text")
+        .control-group
+            label.control-label(for="email") Email:
+            .controls
+                input.span5(name="email", id="email", maxlength="255", type="email")
+                span.help-block.icon-ban-circle  No spam. We promise.
+        .control-group
+            label.control-label(for="password") Password:
+            .controls
+                input.span5(name="password", type="password")
+
+
+        legend Plan
+        .control-group
+            label.control-label(for="plan") Plan:
+            .controls
+                label.radio.
+                    <input type="radio" name="stripe_plan" id="plan_pro" value="pro" checked="checked" />
+                     Pro - $50/month
+                label.radio.
+                    <input type="radio" name="stripe_plan" id="plan_enterprise" value="enterprise" disabled="disabled" />
+                     Enterprise - $250/month - <em>Coming soon!</em>
+
+        legend Credit Card
+        .control-group
+            label.control-label(for="card-number") Credit Card Number:
+            .controls
+                input(id="card-number", size="20", type="text")
+                span#card_type
+        .control-group
+            label.control-label(for="card-cvc") CVC code on back of Credit Card:
+            .controls
+                input.input-mini(id="card-cvc", size="4", type="text")
+        .control-group
+            label.control-label(for="card-expiry-month") Card Expiration Date (MM/YYYY):
+            .controls.controls-row
+                input.input-mini(id="card-expiry-month", size="2", type="text")
+                | &nbsp;/&nbsp;
+                input.input-mini(id="card-expiry-year", size="4", type="text")
+
+        legend Billing Address
+        .control-group
+            label.control-label(for="address_line1") Street line 1
+            .controls
+                input.span5(id="address_line1", type="text")
+        .control-group
+            label.control-label(for="address_line2") Street line 2
+            .controls
+                input.span5(id="address_line2", type="text")
+        .control-group
+            label.control-label(for="address_city") City
+            .controls
+                input(id="address_city", type="text")
+        .control-group
+            label.control-label(for="address_state") State
+            .controls
+                input.input-mini(id="address_state", type="text")
+        .control-group
+            label.control-label(for="address_zip") Zip Code
+            .controls
+                input.input-mini(id="address_zip", type="text")
+        .control-group
+            label.control-label(for="address_country") Country
+            .controls
+                input.span5(id="address_country", value="USA", type="text")
+
+
+        .control-group
+            .controls
+                button.btn.btn-primary#signup-btn(type="submit", disabled)  Sign up
+
+    script(src="https://js.stripe.com/v1/")
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
+    script window.jQuery || document.write('<script src="scripts/jquery-1.8.2.min.js"><\\/script>')
+    script
+        if (typeof Stripe == "undefined") {
+            alert("We appear to be having issues communicating with our credit card processor, try refreshing the page");
+        }
+        Stripe.setPublishableKey('#{STRIPE_PUBLIC_KEY}');
+
+        function setValid(el, isValid) {
+            el = el.parents('.control-group');
+            el.removeClass('error success');
+            el.addClass(isValid ? 'success' : 'error');
+        }
+
+        $('#card-number').blur(function() {
+            var el = $(this), num = el.val();
+            setValid(el, Stripe.validateCardNumber(num));
+            var type = Stripe.cardType(num);
+            type = (type == 'Unknown') ? '' : type;
+            $('#card_type').text(type);
+            var classType = type.toLowerCase();
+            if(el.data('type')) {
+                el.removeClass(el.data('type'))
+            }
+            el.addClass(classType).data('type',classType);
+        });
+
+        $('#card-cvc').blur(function() {
+            var el = $(this);
+            setValid(el, Stripe.validateCVC(el.val()));
+        });
+
+        $('#card-expiry-year').blur(function() {
+            setValid($(this),
+                Stripe.validateExpiry(
+                    $('#card-expiry-month').val(),
+                    $('#card-expiry-year').val()
+                )
+            );
+        });
+
+        $('#signup-form').submit(function() {
+            $('#signup-btn').attr("disabled", "disabled").text("Thanks! Hold on a moment while we get everything set up...");
+            Stripe.createToken({
+                number: $('#card-number').val(),
+                cvc: $('#card-cvc').val(),
+                exp_month: $('#card-expiry-month').val(),
+                exp_year: $('#card-expiry-year').val(),
+                name: $('#name').val(),
+                address_line1: $('#address_line1').val(),
+                address_line2: $('#address_line2').val(),
+                address_state: $('#address_city').val(),
+                address_state: $('#address_state').val(),
+                address_state: $('#address_state').val(),
+                address_zip: $('#address_zip').val(),
+                address_country: $('#address_country').val()
+            }, function stripeResponseHandler(status, response) {
+                   if (response.error) {
+                       alert('We encountered an error processing your Credit Card:\n\n' + response.error.message);
+                   } else {
+                       var form$ = $("#signup-form");
+                       // token contains id, last4, and card type
+                       var token = response['id'];
+                       // insert the token into the form so it gets submitted to the server
+                       form$.append("<input type='hidden' name='stripe_token' value='" + token + "'/>");
+                       // and submit
+                       alert('stripe response: ' + JSON.stringify(response));
+                       form$.get(0).submit();
+                   }
+               });
+
+            return false;
+        });
+
+        // now that we've loaded...
+        $('#signup-btn').removeAttr("disabled", "disabled");
+
+    style(type="text/css").
+        #card_type { margin-left:1em; }

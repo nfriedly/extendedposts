@@ -35,8 +35,7 @@ html(class='no-js', lang='en')
                 .container
                     a(href="/").brand <b>Extended</b>Posts
                     ul.nav
-                        - console.log('link', link);
-                        - var links = {"Home":"/", "About":"/about", "Pricing":"/pricing", "API Documentation": "/docs"}
+                        - var links = {"Home":"/", "About":"/about", "Plans and Pricing":"/plans", "API Documentation": "/docs"}
                         each thisLink, name in links
                             if link == thisLink
                                 li.active: a(href="#{thisLink}") #{name}
@@ -54,7 +53,7 @@ html(class='no-js', lang='en')
             window.fbAsyncInit = function() {
             // init the FB JS SDK
             FB.init({
-            appId      : '#{fb_app_id}', // App ID from the App Dashboard
+            appId      : '#{FB_APP_ID}', // App ID from the App Dashboard
             //- channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File for x-domain communication
             status     : false, // check the login status upon init?
             cookie     : false, // set sessions cookies to allow your server to access the session?
@@ -75,16 +74,13 @@ html(class='no-js', lang='en')
             ref.parentNode.insertBefore(js, ref);
             }(document));
 
-        //- script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
-        //- script window.jQuery || document.write('<script src="javascripts/libs/jquery-1.8.2.min.js"><\\/script>')
-
         //- script(defer, src='javascripts/plugins.js')
         //- script(defer, src='javascripts/script.js')
 
-        if gaId
+        if GA_ID
             script
                 var _gaq = _gaq || [];
-                _gaq.push(['_setAccount', 'UA-35891787-1']);
+                _gaq.push(['_setAccount', '#{GA_ID}']);
                 _gaq.push(['_setDomainName', 'extendedposts.com']);
                 _gaq.push(['_trackPageview']);
                 (function() {
