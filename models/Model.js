@@ -39,7 +39,7 @@ var Model = function(table, fields) {
         return res;
     }
 
-    var INSERT_ID_QUERY = util.format("SELECT currval(pg_get_serial_sequence('users', 'id')) as id", this.table);
+    var INSERT_ID_QUERY = util.format("SELECT currval(pg_get_serial_sequence('%s', 'id')) as id", this.table);
 
     self.new = function(data) {
         var res = new Stream();
