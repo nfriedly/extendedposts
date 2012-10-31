@@ -1,6 +1,6 @@
 var _ = require('underscore');
 var config = require('../config');
-var Users = new (require('../models/UserModel'))();
+var accountModel = new (require('../models/AccountModel'))();
 var stripe = require('stripe')(config.STRIPE_PRIVATE_KEY);
 var async = require('async');
 var crypto = require('crypto');
@@ -32,7 +32,7 @@ module.exports.postNew = function(req, res) {
             saveUser: ["hashPassword", "stripeCustomer", function (next, results) {
                 user_data.stripe_id = results.stripeCustomer.id;
                 console.log("customer id", user_data.stripe_id);
-                Users.new(req.body).on('data', function(user_id) {
+                accountModel.new(req.body).on('data', function(user_id) {
                     user_data.id = user_id;
                     next(null, user_data);
                 }).on('error', function(err) {

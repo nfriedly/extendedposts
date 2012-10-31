@@ -1,5 +1,5 @@
-CREATE TABLE schema_migrations (
-	versions varchar(100) PRIMARY KEY,
+CREATE TABLE schema_migration (
+	version varchar(100) PRIMARY KEY,
 	timestamp timestamptz DEFAULT NOW()
 );
 

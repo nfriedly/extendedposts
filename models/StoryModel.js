@@ -3,8 +3,8 @@ var Model = require('./Model');
 var Stream = require('stream');
 var client = require('./client');
 
-function PostModel() {
-    Model.call(this, 'posts', ['user_id', 'name', 'body', 'caption', 'description']);
+function StoryModel() {
+    Model.call(this, 'story', ['account_id', 'name', 'body', 'caption', 'description']);
 
     var self = this;
     // getById(), new(), and update() are all created automatically by Model
@@ -14,7 +14,7 @@ function PostModel() {
         res.readable = true;
         res.writeable = true;
 
-        var query = client.query("INSERT INTO fb_posts (post_id, fb_post_id) VALUES ($1, $2)", [id, fb_post_id]);
+        var query = client.query("INSERT INTO fb_post (story_id, fb_post_id) VALUES ($1, $2)", [id, fb_post_id]);
 
         query.on('error', function(err) {
             res.emit('error', err);
@@ -32,8 +32,8 @@ function PostModel() {
 
 }
 
-util.inherits(PostModel, Model);
+util.inherits(StoryModel, Model);
 
-module.exports = PostModel;
+module.exports = StoryModel;
 
 

@@ -1,7 +1,7 @@
 var util = require('util');
 var jsdom = require('jsdom');
 var config = require('../config');
-var posts = new (require('../models/PostModel'))();
+var storyModel = new (require('../models/StoryModel'))();
 
 function error(req, res, status, err) {
     if(arguments.length == 3) {
@@ -34,7 +34,7 @@ function error(req, res, status, err) {
 
 module.exports = {
     getNew: function(req, res) {
-        res.render('post_new', config.templateData);
+        res.render('story_new', config.templateData);
     },
 
     idMatcher: function(req, res, next, id){
@@ -46,10 +46,10 @@ module.exports = {
     },
 
     getById: function(req, res) {
-        posts.get(req.params.id).on('data', function(row) {
+        storyModel.get(req.params.id).on('data', function(row) {
             res.render('post', _.defaults(row, config.templateData));
         }).on('error', function(err){
-                if(err instanceof posts.NoRowsError) {
+                if(err instanceof storyModel.NoRowsError) {
                     res.status('404').render('404', config.templateData);
                 } else {
                     console.log('getById database error: ', err);
@@ -63,9 +63,9 @@ module.exports = {
     postById: function(req, res) {
         if (req.query.post_id) {
             // the user posted this story to his or her wall
-            posts.addFbPostId(req.params.id, req.query.post_id);
+            storyModel.addFbPostId(req.params.id, req.query.post_id);
         }
-        res.redirect(req.query.redirect_ur || '/post/' + req.params.id);
+        res.redirect(req.query.redirect_ur || '/story/' + req.params.id);
     },
 
     postNew: function(req, res) {
@@ -120,7 +120,7 @@ module.exports = {
         }
         caption = caption || ' ';
 
-        posts.new(req.body).on('data', function(result) {
+        storyModel.new(req.body).on('data', function(result) {
             console.log('post saved and database row found: ', result);
             var read_post_url = (process.env.FB_APP_URL || "https://apps.facebook.com/extendedposts/") + "post/" +  result.id;
             var redirect_url = read_post_url;

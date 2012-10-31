@@ -4,7 +4,7 @@ var Model = require('./Model');
 var client = require('./client');
 
 function UserModel() {
-    Model.call(this, 'users', ['name', 'email', 'password_salt', 'password_hash', 'stripe_id', 'stripe_plan']);
+    Model.call(this, 'account', ['name', 'email', 'password_salt', 'password_hash', 'stripe_id', 'stripe_plan']);
 
     var self = this;
 
