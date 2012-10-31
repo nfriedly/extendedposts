@@ -19,7 +19,8 @@
 		"npm": "1.1.x"
 	},
     "scripts": {
-        "prestart": "migrate_db.js"
+        "prestart": "./migrate_db.js",
+        "start": "node server.js"
     }
 
 }
