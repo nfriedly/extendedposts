@@ -1,0 +1,20 @@
+extends layout
+
+block set_options
+    - var title = "Sign up"
+
+block content
+    h1 Log In
+    form.form-horizontal(action="/account/login", method="POST", target="_top")
+        .control-group
+            label.control-label(for="email") Email:
+            .controls
+                input.span5(name="email", maxlength="255", type="email")
+        .control-group
+            label.control-label(for="password") Password:
+            .controls
+                input.span5(name="password", type="password")
+
+        .control-group
+            .controls
+                button.btn.btn-primary#signup-btn(type="submit")  Log In

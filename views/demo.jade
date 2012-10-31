@@ -4,7 +4,8 @@ block set_options
     - var title = "Create a new story to to post to Facebook"
 
 block content
-    form.form-horizontal(action="", method="POST", target="_top")
+    form.form-horizontal(action="/story/new", method="POST", target="_top")
+        input(type="hidden", name="api_key", value="__demo__");
         legend
             | New Story&nbsp;
             i.icon-align-left

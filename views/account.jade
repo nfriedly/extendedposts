@@ -1,0 +1,13 @@
+extends layout
+
+block set_options
+    - var title = "Sign up"
+
+block content
+
+    h1 My Account
+    p: small #{account.name} <#{account.email}>
+
+    h2 API Key
+    p.warn Be sure to keep this secret!
+    p: code #{account.api_key}
