@@ -29,47 +29,69 @@ if (process.argv.length == 2) {
     var db = new postgres.Client(config.DB_URL);
     db.connect();
 
-    // get all already executed migrations.
-    db.query('SELECT "version" FROM "schema_migration"', function (err, resp) {
-        var migrations_run = 0;
-        var executed = [];
+    async.auto({
 
-        // if there is an error assume we are at the default state, and run root migration
-        if (err) {
-            console.log("Creating initial schema");
+        // get all already executed migrations. If that fails, then try to create the DB from scratch
+        executed: function(next) {
+            db.query('SELECT "version" FROM "schema_migration"', function (err, resp) {
+                var executed = [];
 
-            // attempt to run file located at APP_ROOT/migrations/schema/root.sql to set up the initial schema / data
-            var schema = fs.readFileSync(migrations_dir+"schema/root.sql").toString();
-            db.query(schema, function(err2) {
-                err && console.error("Error creating initial schema", err2, "\n\nPrevious error reading from schema_migration ", err);
+                // if there is an error assume we are at the default state, and run root migration
+                if (err) {
+                    console.log("Creating initial schema");
+
+                    // attempt to run file located at APP_ROOT/migrations/schema/root.sql to set up the initial schema / data
+                    var schema = fs.readFileSync(migrations_dir+"schema/root.sql").toString();
+                    db.query(schema, function(err2) {
+                        if (err2) {
+                            console.error("Error creating initial schema", err2, "\n\nPrevious error reading from schema_migration ", err);
+                            next(err2);
+                            return;
+                        }
+                        next(null, executed);
+                    });
+
+                } else {
+                    // if no error, dump all versions into an array called executed for quick searching.
+                    for (var rl = resp.rows.length; rl >0; rl--) {
+                        executed.push(resp.rows[rl-1].version);
+                    }
+                    next(null, executed);
+                }
             });
-
-        } else {
-            // if no error, dump all versions into an array called executed for quick searching.
-            for (var rl = resp.rows.length; rl >0; rl--) {
-                executed.push(resp.rows[rl-1].version);
-            }
-        }
+        },
 
         // populate all existing migrations by reading the migrations directory
-        fs.readdir(migrations_dir, function (err, list) {
-            var migrations = [];
-            for (var li = 0, ll = list.length; li < ll; li++) {
-                // if the file has a .sql extension, load it as a file read for sql schema updating
-                if (m = list[li].match(/(.*)\.sql/)) {
-                    migrations.push({
-                        id: m[1],
-                        sql: fs.readFileSync(migrations_dir+m[0]).toString()
-                    });
-
-                    // if the file has a .js extension, load via require system and set js attribute as .migrate function
-                } else if (j = list[li].match(/(.*)\.js/)) {
-                    migrations.push({
-                        id: j[1],
-                        js: require(migrations_dir+"/"+list[li]).migrate
-                    });
+        allMigrations: function(next) {
+            fs.readdir(migrations_dir, function (err, list) {
+                if (err) {
+                    return next(err);
                 }
-            }
+
+                var migrations = [];
+                for (var li = 0, ll = list.length; li < ll; li++) {
+                    // if the file has a .sql extension, load it as a file read for sql schema updating
+                    if (m = list[li].match(/(.*)\.sql/)) {
+                        migrations.push({
+                            id: m[1],
+                            sql: fs.readFileSync(migrations_dir+m[0]).toString()
+                        });
+
+                        // if the file has a .js extension, load via require system and set js attribute as .migrate function
+                    } else if (j = list[li].match(/(.*)\.js/)) {
+                        migrations.push({
+                            id: j[1],
+                            js: require(migrations_dir+"/"+list[li]).migrate
+                        });
+                    }
+                }
+
+                next(null, migrations);
+            });
+        },
+
+        migrationsToRun: ["allMigrations", "executed", function(next, results) {
+            var migrations = results.allMigrations, executed = results.executed;
 
             console.log("" + migrations.length + " migrations found");
 
@@ -80,13 +102,16 @@ if (process.argv.length == 2) {
 
             //sort migrations by id (timestamp) in ascending order - run the oldest ones first
             migrations = migrations.sort(function (a, b) {
-                return ( parseInt(b.id) - parseInt(a.id));
+                return ( parseInt(a.id) - parseInt(b.id));
             });
-
 
             console.log("" + migrations.length + " migrations need executed");
 
-            async.forEachSeries(migrations, function(migration, callback) {
+            next(null, migrations);
+        }],
+
+        doMigrations: ["migrationsToRun", function(next, results) {
+            async.forEachSeries(results.migrationsToRun, function(migration, callback) {
                 // alert of execution
                 console.log("Executing migration: "+migration.id);
 
@@ -119,22 +144,21 @@ if (process.argv.length == 2) {
                         console.error(e);
                         db.end();
                     } else {
-                        console.log("done.");
-                        // otherwise add to counter and run the rest of the "torun" array
-                        migrations_run++;
+                        console.log("done.")
                         callback();
                     }
                 });
-            }, function(err){
-                if (err) {
-                    console.error(err);
-                } else {
-                    migrations.length && console.log("All migrations completed successfully!");
-                }
-                db.end();
-                process.exit(err ? 1 : 0);
-            });
-        });
+            }, next);
+        }]
+
+    }, function(err, results) {
+        if (err) {
+            console.error(err);
+        } else {
+            results.allMigrations.length && console.log("All migrations completed successfully!");
+        }
+        db.end();
+        process.exit(err ? 1 : 0);
     });
 
 // if provided a generate argument: ./script/migrate generate or ./script/migrate -g
