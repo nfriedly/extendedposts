@@ -1,5 +1,6 @@
 var util = require('util');
 var jsdom = require('jsdom');
+var _ = require('underscore');
 var config = require('../config');
 var storyModel = new (require('../models/StoryModel'))();
 
@@ -63,7 +64,7 @@ module.exports = {
     },
 
     // fb likes to POST to the redirect url
-    // /post/28?post_id=100001635164962_548726125142879
+    // /story/28?post_id=100001635164962_548726125142879
     postById: function(req, res) {
         if (req.query.post_id) {
             // the user posted this story to his or her wall

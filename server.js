@@ -101,11 +101,11 @@ if (cluster.isMaster) {
     app.post('/account/login', account.postLogin);
     app.get('/account', account.authenticateUser, account.get);
 
-    var post = require('./controlers/story');
-    app.param('id', post.idMatcher);
-    app.get('/story/:id', post.getById);
-    app.post('/story/:id', post.postById); // FB does this - no API key needed
-    app.post('/story/new', account.authenticateApiKey, post.postNew);
+    var story = require('./controlers/story');
+    app.param('id', story.idMatcher);
+    app.get('/story/:id', story.getById);
+    app.post('/story/:id', story.postById); // FB does this - no API key needed
+    app.post('/story/new', account.authenticateApiKey, story.postNew);
 
     app.listen(app.get('port'), function(){
         console.log("ExtendedPosts server listening on port " + app.get('port'));
