@@ -125,7 +125,7 @@ module.exports = {
 
         storyModel.new(req.body).on('data', function(result) {
             console.log('post saved and database row found: ', result);
-            var read_post_url = (process.env.FB_APP_URL || "https://apps.facebook.com/extendedposts/") + "post/" +  result.id;
+            var read_post_url = (process.env.FB_APP_URL || "https://apps.facebook.com/extendedposts/") + "story/" +  result.id;
             var redirect_url = read_post_url;
             if (req.body.redirect_url) {
                 redirect_url +='?redirect_url=' + req.body.redirect_url;
