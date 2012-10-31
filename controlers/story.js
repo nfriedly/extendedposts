@@ -33,9 +33,6 @@ function error(req, res, status, err) {
 
 
 module.exports = {
-    getNew: function(req, res) {
-        res.render('story_new', config.templateData);
-    },
 
     idMatcher: function(req, res, next, id){
         if(parseInt(id) == id) {
@@ -47,7 +44,14 @@ module.exports = {
 
     getById: function(req, res) {
         storyModel.get(req.params.id).on('data', function(row) {
-            res.render('post', _.defaults(row, config.templateData));
+            res.format({
+                html: function() {
+                    res.render('story', _.defaults(row, config.templateData));
+                },
+                json: function() {
+                    res.send(row);
+                }
+            });
         }).on('error', function(err){
                 if(err instanceof storyModel.NoRowsError) {
                     res.status('404').render('404', config.templateData);
@@ -55,7 +59,7 @@ module.exports = {
                     console.log('getById database error: ', err);
                     res.send(500, err);
                 }
-            });
+        });
     },
 
     // fb likes to POST to the redirect url
@@ -69,9 +73,7 @@ module.exports = {
     },
 
     postNew: function(req, res) {
-
-        // todo: add real authentication
-        req.body.user_id = 1;
+        req.body.account_id = req.account.id;
 
         try {
             ['name','picture','body'].forEach(function(field) {
@@ -158,7 +160,7 @@ module.exports = {
 
         }).on('error', function(err){
                 return(error(req, res, 500, err));
-            });
+        });
     }
 };
 

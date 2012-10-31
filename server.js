@@ -30,10 +30,11 @@ if (cluster.isMaster) {
     });
 
     app.configure(function(){
-        app.set('port', process.env.PORT || 3000);
+        app.set('port', config.PORT);
         app.set('views', __dirname + '/views');
         app.set('view engine', 'jade');
         app.use(express.bodyParser());
+        /*
         var METHOD_KEY = "method";
         app.use(function methodOverride(req, res, next) {
             req.originalMethod = req.originalMethod || req.method;
@@ -59,6 +60,9 @@ if (cluster.isMaster) {
 
             next();
         });
+        */
+        app.use(express.cookieParser());
+        app.use(express.cookieSession({secret: config.COOKIE_SECRET, proxy: true}));
         app.use(app.router);
         app.use(require('less-middleware')({ src: __dirname + '/public' }));
     });
@@ -85,7 +89,7 @@ if (cluster.isMaster) {
         res.redirect('/');
     });
 
-    app.get(/(about|plans|docs)/, function(req, res) {
+    app.get(/(about|plans|docs|demo)/, function(req, res) {
         var page = req.params[0];
         res.render(page, config.templateData);
     });
@@ -93,14 +97,15 @@ if (cluster.isMaster) {
     var account = require('./controlers/account');
     app.get('/account/new', account.getNew);
     app.post('/account/new', account.postNew);
-    app.get('/account', account.get);
+    app.get('/account/login', account.getLogin);
+    app.post('/account/login', account.postLogin);
+    app.get('/account', account.authenticateUser, account.get);
 
-    var post = require('./controlers/post');
-    app.get('/post/new', post.getNew);
+    var post = require('./controlers/story');
     app.param('id', post.idMatcher);
-    app.get('/post/:id', post.getById);
-    app.post('/post/:id', post.postById);
-    app.post('/post/new', post.postNew);
+    app.get('/story/:id', post.getById);
+    app.post('/story/:id', post.postById); // FB does this - no API key needed
+    app.post('/story/new', account.authenticateApiKey, post.postNew);
 
     app.listen(app.get('port'), function(){
         console.log("ExtendedPosts server listening on port " + app.get('port'));

@@ -16,11 +16,11 @@ var Model = function(table, fields) {
         values: [0]
     });
 
-    self.get = function(id) {
+    self.get = function(id, callback) {
         return self.queryToStream(client.query({
             name: self.table + 'getById',
             values: [id]
-        }));
+        }), callback);
     };
 
     var INSERT_QUERY = util.format(
@@ -41,7 +41,7 @@ var Model = function(table, fields) {
 
     var INSERT_ID_QUERY = util.format("SELECT currval(pg_get_serial_sequence('%s', 'id')) as id", this.table);
 
-    self.new = function(data) {
+    self.new = function(data, callback) {
         var res = new Stream();
         res.readable = true;
         res.writeable = true;
@@ -65,38 +65,62 @@ var Model = function(table, fields) {
             }
         });
 
+        self.subscribeCallback(res, callback);
+
         return res;
     };
 
-    self.update = function(id, data) {
-
+    self.update = function(id, data, callback) {
+        var fields = [];
+        var i = 0;
+        _.each(data, function(value, key) {
+            i++;
+            fields.push(util.format('%s = $%s', key, i));
+        });
+        var query = util.format("UPDATE %s SET %s WHERE id= %s",
+            self.table,
+            fields.join(', '),
+            id
+        );
+        return self.queryToStream(pg.query(query), callback);
     };
+
+    self.queryToStream = function(query, callback) {
+        var res = new Stream();
+        res.readable = true;
+        res.writeable = false;
+
+        query.on('row', function(row) {
+            res.emit('data',row);
+        });
+
+        query.on('error', function(err) {
+            res.emit('error', err);
+        });
+
+        query.on('end', function(result) {
+            if(result && result.rowCount == 0) {
+                res.emit('error', new self.NoRowsError())
+            }
+            res.emit('end', result);
+        });
+
+        self.subscribeCallback(res, callback);
+
+        return res;
+    }
 
 };
 
 module.exports = Model;
 
-Model.prototype.queryToStream = function(query) {
-    var res = new Stream();
-    res.readable = true;
-    res.writeable = false;
-
-    query.on('row', function(row) {
-        res.emit('data',row);
-    });
-
-    query.on('error', function(err) {
-        res.emit('error', err);
-    });
-
-    query.on('end', function(result) {
-        if(result && result.rowCount == 0) {
-            res.emit('error', new NoRowsError())
-        }
-        res.emit('end', result);
-    });
-
-    return res;
+Model.prototype.subscribeCallback = function(stream, callback) {
+    if (!callback) {
+        return;
+    }
+    stream.on('data', function(res) {
+        callback(null, res);
+    }).on('error', callback);
 };
 
 Model.prototype.NoRowsError = function() {

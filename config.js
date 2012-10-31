@@ -1,7 +1,9 @@
 var config = {
     STRIPE_PRIVATE_KEY: process.env.STRIPE_PRIVATE_KEY || "sk_test_Rtqdqmlu61z7TXB43Z5UpNGB",
     STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY || "pk_test_UISfg44mvvob3QnCVacGMQQc",
-    DB_URL: process.env.DATABASE_URL || "tcp://postgres:1234@localhost/postgres"
+    DB_URL: process.env.DATABASE_URL || "tcp://postgres:1234@localhost/postgres",
+    PORT: process.env.PORT || 3000,
+    COOKIE_SECRET: process.env.COOKIE_SECRET || "cheezeburger"
 };
 
 config.templateData = {

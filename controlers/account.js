@@ -5,6 +5,7 @@ var stripe = require('stripe')(config.STRIPE_PRIVATE_KEY);
 var async = require('async');
 var crypto = require('crypto');
 
+
 module.exports.getNew = function(req, res) {
     var templateData = _.defaults({
         plan: req.query.plan || false
@@ -39,14 +40,15 @@ module.exports.postNew = function(req, res) {
                     next(err);
                 });
             }],
-
-    //        function getRandomBytes(next) {
-    //            crypto.randomBytes(12, next)
-    //        }, function createAPIKey(bytes, next) {
-    //            user.api_key = ""
-    //        }
-            redirect: ["saveUser", function (next, results) {
-                // todo: log user in
+            randomBytes: function(next) {
+                crypto.randomBytes(12, next);
+            },
+            saveAPiKey: ["saveUser", "randomBytes", function (next, results) {
+                user_data.api_key = "ep_" + user_data.id +"_" + results.randomBytes.toString('hex');
+                accountModel.update(user_data.id, {api_key: user_data.api_key}, next);
+            }],
+            redirect: ["saveAPiKey", function (next, results) {
+                req.session.account = user_data;
                 res.redirect('/account');
             }]
 
@@ -56,11 +58,74 @@ module.exports.postNew = function(req, res) {
     });
 };
 
-
-module.exports.get = function(req, res) {
-    res.type('.txt').send('Hi!');
+module.exports.getLogin = function(req, res) {
+    res.render('account_login', config.templateData);
 };
 
+module.exports.postLogin = function(req, res) {
+    if (!req.body.email || !req.body.password) {
+        req.redirect('/account/login?error=blank');
+    } else {
+        accountModel.getByEmail(req.body.email)
+            .on('data', function(user) {
+                crypto.pbkdf2(req.body.password, user.password_salt , 100000, 100, function(err, pass_bits) {
+                    if (err) {
+                        console.error('error during login', err);
+                        res.redirect('/account/login?error=internal');
+                        return;
+                    }
+                    if (new Buffer(pass_bits, 'binary').toString('base64') == user.password_hash) {
+                        delete user.password_hash;
+                        delete user.password_salt;
+                        req.session.account = user;
+                        res.redirect('/account');
+                    } else {
+                        res.redirect('/account/login?error=invalid');
+                    }
+                });
+            }).on('error', function(err) {
+                if (err instanceof accountModel.NoRowsError ) {
+                    res.redirect('/account/login?error=invalid');
+                } else {
+                    console.error('error during login', err);
+                    res.redirect('/account/login?error=internal');
+                }
+            });
+    }
+};
+
+module.exports.authenticateUser = function(req, res, next) {
+    if (!req.session || !req.session.account) {
+        res.redirect('/account/login');
+    } else {
+        next();
+    }
+};
+
+module.exports.get = function(req, res) {
+    res.render('account', _.defaults(req.session, config.templateData));
+};
+
+module.exports.authenticateApiKey = function(req, res, next) {
+    var api_key = req.param('api_key');
+    console.log('authing by api key', api_key);
+    if(!api_key) {
+        res.status(401).send({success: false, error: "api_key field is required"});
+    }
+    accountModel.getByApiKey(api_key, function(err, account) {
+        if (err) {
+            if (err instanceof  accountModel.NoRowsError) {
+                res.status(401).send({success: false, error: 'api_key does not appear to be valid'});
+            }
+            console.error(err);
+            res.status(500).send({success: false, error: 'Error finding account'});
+            return;
+        }
+        console.log('account found', account);
+        req.account = account;
+        next()
+    });
+};
 
 // loosely bassed on http://stackoverflow.com/questions/11557467/node-js-crypto-pbkdf2-password-to-hex
 // and http://codereview.stackexchange.com/questions/12330/node-js-password-salting-hashing
