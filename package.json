@@ -19,7 +19,7 @@
 		"npm": "1.1.x"
 	},
     "scripts": {
-        "install": "migrate_db.js"
+        "prestart": "migrate_db.js"
     }
 
 }
