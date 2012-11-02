@@ -34,33 +34,7 @@ if (cluster.isMaster) {
         app.set('views', __dirname + '/views');
         app.set('view engine', 'jade');
         app.use(express.bodyParser());
-        /*
-        var METHOD_KEY = "method";
-        app.use(function methodOverride(req, res, next) {
-            req.originalMethod = req.originalMethod || req.method;
 
-            // req.body
-            if (req.body && METHOD_KEY in req.body) {
-                req.method = req.body[METHOD_KEY].toUpperCase();
-                delete req.body[METHOD_KEY];
-
-            // req.query
-            } else if (req.query && METHOD_KEY in req.query) {
-                req.method = req.query[METHOD_KEY].toUpperCase();
-                delete req.query[METHOD_KEY]
-                if (req.method != "GET") {
-                    req.body = req.query;
-                    // delete req.query; // can't do this because the jsonp doce depends on req.query
-                }
-
-            // check X-HTTP-Method-Override
-            } else if (req.headers['x-http-method-override']) {
-                req.method = req.headers['x-http-method-override'].toUpperCase();
-            }
-
-            next();
-        });
-        */
         app.use(express.cookieParser());
         app.use(express.cookieSession({secret: config.COOKIE_SECRET, proxy: true}));
         app.use(app.router);

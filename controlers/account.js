@@ -20,7 +20,6 @@ module.exports.postNew = function(req, res) {
     // although it seems to like to retry things once if something fails - hence the _.once
     async.auto({
             stripeCustomer: _.once(function(next) {
-                console.log("creating stripe customer");
                 stripe.customers.create({
                         email: req.body.email,
                         plan: req.body.stripe_plan,
@@ -32,7 +31,6 @@ module.exports.postNew = function(req, res) {
             },
             saveUser: ["hashPassword", "stripeCustomer", function (next, results) {
                 user_data.stripe_id = results.stripeCustomer.id;
-                console.log("customer id", user_data.stripe_id);
                 accountModel.new(req.body).on('data', function(user_id) {
                     user_data.id = user_id;
                     next(null, user_data);
@@ -108,7 +106,6 @@ module.exports.get = function(req, res) {
 
 module.exports.authenticateApiKey = function(req, res, next) {
     var api_key = req.param('api_key');
-    console.log('authing by api key', api_key);
     if(!api_key) {
         res.status(401).send({success: false, error: "api_key field is required"});
     }
@@ -121,7 +118,6 @@ module.exports.authenticateApiKey = function(req, res, next) {
             res.status(500).send({success: false, error: 'Error finding account'});
             return;
         }
-        console.log('account found', account);
         req.account = account;
         next()
     });

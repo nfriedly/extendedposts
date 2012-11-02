@@ -4,23 +4,53 @@ block set_options
     - var title = "Create a new story to to post to Facebook"
 
 block content
-    form.form-horizontal(action="/story/new", method="POST", target="_top")
-        input(type="hidden", name="api_key", value="__demo__");
-        legend
-            | New Story&nbsp;
-            i.icon-align-left
-        .control-group
-            label.control-label(for="name") Name:
-            .controls
-                input.span5(name="name", maxlength="80")
-        .control-group
-            label.control-label(for="picture") Picture URL:
-            .controls
-                input.span5(name="picture")
-        .control-group
-            label.control-label(for="body") Body:
-            .controls
-                textarea.span5(name="body", rows="5")
-        .control-group
-            .controls
-                button.btn.btn-primary.icon-facebook(type="submit")  Post to Facebook
+    .span7
+        form#demo-form.form-horizontal(action="/story/new", method="POST", target="_top")
+            input(type="hidden", name="api_key", value="__demo__");
+            legend
+                | New Story&nbsp;
+                i.icon-align-left
+            .control-group
+                label.control-label(for="name") Name:
+                .controls
+                    input.input-xlarge(name="name", maxlength="80", type="text")
+            .control-group
+                label.control-label(for="picture") Picture URL:
+                .controls
+                    input.input-xlarge(name="picture", type="text")
+            .control-group
+                label.control-label(for="body") Body (HTML):
+                .controls
+                    textarea.input-xlarge(name="body", rows="5")
+
+            .control-group
+                .controls
+                    button.btn.btn-primary(type="submit") Get Link
+
+        pre#out.code
+
+
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
+    script window.jQuery || document.write('<script src="scripts/jquery-1.8.2.min.js"><\\/script>')
+    script
+        $(document).ready(function() {
+            $out = $('#out');
+            $out.addLine = function(line) {
+                this.append('\n' + line);
+            }
+            $out.reset = function() {
+                this.html('');
+            }
+            $form = $('#demo-form');
+            $form.submit(function() {
+                $out.reset();
+                var data = $form.serialize();
+                $out.addLine('POST http://api.extendedposts.com/story/new\n' + data);
+                $out.addLine('');
+                $.post('/story/new', data, function(response, status) {
+                    response = JSON ? JSON.stringify(response) : response.post_to_fb_url;
+                    $out.addLine(response.replace(/"(http[^\"]*)"/g, '"<a href=\"$1\">$1</a>\"'));
+                });
+                return false;
+            });
+        });

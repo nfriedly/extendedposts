@@ -48,8 +48,6 @@ var Model = function(table, fields) {
 
         var query = client.query(INSERT_QUERY, formatForInsert(data));
 
-        console.log(query);
-
         query.on('error', function(err) {
             res.emit('error', err);
         });

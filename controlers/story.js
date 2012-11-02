@@ -142,22 +142,24 @@ module.exports = {
                 encodeURIComponent((req.body.actions) ? '&actions=' + req.body.actions : '')
             );
 
-            var formats = {
-                text: function(){
-                    res.type('.txt').send(post_to_fb_url);
-                },
-                html: function(){
-                    res.redirect(post_to_fb_url);
-                },
-                json: function(){
-                    res.jsonp({success: true, post_to_fb_url: post_to_fb_url});
-                }
-            };
-            if (req.body.format && formats[req.body.format]) {
-                formats[req.body.format]();
-            } else {
-                res.format(formats);
-            }
+//            var formats = {
+//                text: function(){
+//                    res.type('.txt').send(post_to_fb_url);
+//                },
+//                html: function(){
+//                    res.redirect(post_to_fb_url);
+//                },
+//                json: function(){
+//                    res.jsonp({success: true, post_to_fb_url: post_to_fb_url});
+//                }
+//            };
+//            if (req.body.format && formats[req.body.format]) {
+//                formats[req.body.format]();
+//            } else {
+//                res.format(formats);
+//            }
+
+            res.send({success: true, post_to_fb_url: post_to_fb_url});
 
         }).on('error', function(err){
                 return(error(req, res, 500, err));
