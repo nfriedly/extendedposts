@@ -57,6 +57,10 @@ if (cluster.isMaster) {
     app.get('/', function(req, res) {
         res.render('index', _.defaults({title: "Post beautiful stories to Facebook's Timeline"}, config.templateData));
     });
+    // just in case FB gets any ideas
+    app.post('/', function(req, res) {
+        res.redirect('/');
+    });
 
     // fb likes to issue POST requests to the home page
     app.post('/', function(req, res) {
@@ -77,9 +81,17 @@ if (cluster.isMaster) {
 
     var story = require('./controlers/story');
     app.param('id', story.idMatcher);
-    app.get('/story/:id', story.getById);
-    app.post('/story/:id', story.postById); // FB does this - no API key needed
-    app.post('/story/new', account.authenticateApiKey, story.postNew);
+    app.get('/story/:id/view', story.viewById);
+    app.post('/story/:id/view', story.postFBPostID); // FB does this - no API key needed
+
+    app.get('/story/:id', account.authenticateApiKey, story.get);
+    app.post('/story/new', account.authenticateApiKey, story.post);
+    app.delete('/story/:id', account.authenticateApiKey, story.delete);
+    app.get('/story/:id/post', story.postStory);
+
+    app.delete('/story/:source_id/variation/:id', account.authenticateApiKey, story.get);
+    app.post('/story/:id/variation/new', account.authenticateApiKey,story.postVariation);
+    app.delete('/story/:source_id/variation/:id', account.authenticateApiKey, story.delete);
 
     app.listen(app.get('port'), function(){
         console.log("ExtendedPosts server listening on port " + app.get('port'));

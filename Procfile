@@ -1,1 +1,1 @@
-web: ./migrate_db.js && node server.js
+web: node server.js

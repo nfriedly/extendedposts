@@ -6,8 +6,19 @@ var client = require('./client');
 var Model = function(table, fields) {
     this.table = table;
     this.fields = fields;
+//    this.all_fields = fields;
 
     var self = this;
+
+//    client.query("SELECT column_name FROM information_schema.columns WHERE table_name =$1;", [this.table])
+//        .on('error',function(err) {
+//            console.error("Error in initial column lookup", err);
+//        })
+//        .on('row', function(row) {
+//            if (!_.contains(self.all_fields, row.column_name)) {
+//                self.all_fields.push(row.column_name);
+//            }
+//        });
 
     // set up the stored procedure for getById
     client.query({
@@ -15,6 +26,7 @@ var Model = function(table, fields) {
         text: util.format('SELECT * FROM %s WHERE id=$1', this.table),
         values: [0]
     });
+
 
     self.get = function(id, callback) {
         return self.queryToStream(client.query({
@@ -80,7 +92,20 @@ var Model = function(table, fields) {
             fields.join(', '),
             id
         );
-        return self.queryToStream(pg.query(query), callback);
+        return self.queryToStream(client.query(query), callback);
+    };
+
+    self.delete = function(id, callback) {
+        //if (_.contains(self.all_fields, 'visible')) {
+        //    return self.update(id, {visible: false});
+        //} else {
+            var query = util.format("DELETE FROM %s WHERE id=$1 LIMIT 1",self.table);
+            return self.queryToStream(client.query(query, [id]), callback);
+        //}
+    };
+
+    self.query = function(query, data, callback) {
+        return self.queryToStream(client.query(query, data), callback);
     };
 
     self.queryToStream = function(query, callback) {
@@ -93,6 +118,7 @@ var Model = function(table, fields) {
         });
 
         query.on('error', function(err) {
+            console.error(err);
             res.emit('error', err);
         });
 

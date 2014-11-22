@@ -2,6 +2,60 @@
 
 @fontAwesomePath: '/font-awesome/font';
 
+
+//http://www.colourlovers.com/palette/2515241/aural
+@almost_a_disaster: #EBE5C5;
+@i: #DED586;
+@Isolada: #AABB97;
+@not_on_sale: #BB8899;
+@finesse: #CC5477
+
+
+
+
+
+// Basics
+// -------------------------
+@bodyBackground:        @not_on_sale;
+@textColor:             @almost_a_disaster;
+@headingsColor:         inherit; // empty to use BS default, @textColor
+@linkColor:             #08c;
+@linkColorHover:        darken(@linkColor, 15%);
+
+
+// Inverted navbar
+// -------------------------
+@navbarInverseBackground:                #111111;
+@navbarInverseBackgroundHighlight:       #222222;
+@navbarInverseBorder:                    #252525;
+
+@navbarInverseText:                      @grayLight;
+@navbarInverseBrandColor:                @navbarInverseLinkColor;
+
+@navbarInverseLinkColor:                 @grayLight;
+@navbarInverseLinkColorHover:            @white;
+@navbarInverseLinkColorActive:           @navbarInverseLinkColorHover;
+@navbarInverseLinkBackgroundHover:       transparent;
+@navbarInverseLinkBackgroundActive:      @navbarInverseBackground;
+
+
+
+// Hero unit
+// -------------------------
+@heroUnitBackground:              @grayLighter;
+@heroUnitHeadingColor:            inherit;
+@heroUnitLeadColor:               inherit;
+
+
+// Buttons
+// -------------------------
+@btnBorder:                         #bbb;
+@btnPrimaryBackground:              @linkColor;
+@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 20%);
+
+
+
+
 body {
     padding-top: 60px;
 }

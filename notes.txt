@@ -1,0 +1,20 @@
+CDN & https notes:
+
+
+site.com: redirect to www.site.com
+www.site.com: cname for site-secure.cloudfront.net
+live.site.com: cname for site.herokuapp.com
+api.site.com: cname for live.site.com
+
+fb: site-secure.cloudfront.net -> cf: live.site.com -> site.herokuapp.com
+
+https: site-secure.cloudfront.net || live.site.herokuapp.com
+
+stories link to fb app, but redirect to live.site.com (to accept POST params)
+
+fb urls: site.com & site-secure.cloudfront.net
+
+cache-control: 
+- static content: 1 year & include hash in url
+- posts: time since last update? (+ invalidate on update)
+
